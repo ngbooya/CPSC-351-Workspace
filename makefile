@@ -1,6 +1,6 @@
-all: recv sender
-recv.o: recv.cpp
-	g++ recv.cpp -o revc.out
 
-sender: sender.cpp
-	g++ sender.cpp -o sender.out
+recv.o: recv.cpp
+	g++ recv.cpp -o recv.o
+
+sender.o: sender.cpp
+	g++ sender.cpp -o sender.o

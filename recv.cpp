@@ -13,6 +13,7 @@ using namespace std;
 
 /* The ids for the shared memory segment and the message queue */
 int shmid, msqid;
+int exitCounter = 9;
 
 /* The pointer to the shared memory */
 void *sharedMemPtr;
@@ -53,20 +54,34 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 	/* TODO: Allocate a piece of shared memory. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE. */
 
-	shmid = shmget(key_for_mem, SHARED_MEMORY_CHUNK_SIZE, 0777 | IPC_CREAT);
+	 if((shmid = shmget(key_for_mem, SHARED_MEMORY_CHUNK_SIZE, 0666 | IPC_CREAT)) == -1 ){
+     perror("shmget");
+     exit(1);
+   }
 
 
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
 
 
+ if((msqid = msgget(key_for_mem, 0666 | IPC_CREAT)) == -1){
+   perror("msgget");
+   exit(1);
+ }
 	/* TODO: Attach to the shared memory */
 
-	sharedMemPtr = shmat(shmid, NULL, 0);
+	sharedMemPtr = shmat(shmid, (void *)0, 0);
+
+  if(sharedMemPtr == (char *)(-1)){
+    perror("shmat");
+    exit(1);
+  }
 
 
 	/* TODO: Create a message queue */
 	//Attach to the message queue
-	msqid = msgget(key_for_mem, 0777 | IPC_CREAT);
+
+
+
 
 
 
@@ -80,7 +95,7 @@ void mainLoop()
 {
 	/* The size of the mesage */
 	int msgSize = 0;
-
+  message MyKeyFileMessage;
 	/* Open the file for writing */
 	FILE* fp = fopen(recvFileName, "w");
 
@@ -104,9 +119,13 @@ cout << "Waiting for sender\n";
 
 
 		 //From header file "msg.h"
-		 message MyKeyFileMessage;
 
-		 msgrcv(msqid, &MyKeyFileMessage,sizeof(struct message) - sizeof(long) ,SENDER_DATA_TYPE, 0);
+
+		 if(msgrcv(msqid, &MyKeyFileMessage, sizeof(struct message),SENDER_DATA_TYPE, 0) == -1){
+       perror("msgrcv: Error receiving message 1");
+       fclose(fp);
+       exit(1);
+     }
 ////////////////////////////////////////////////////////////////////////////////////////////
 		 msgSize = MyKeyFileMessage.size; //Added
 		 /* Keep receiving until the sender set the size to 0, indicating that
@@ -129,6 +148,17 @@ cout << "Waiting for sender\n";
  			 * does not matter in this case).
  			 */
 			 MyKeyFileMessage.mtype=RECV_DONE_TYPE;
+
+
+       if(msgsnd(msqid,&MyKeyFileMessage,0,0) == -1){
+         perror("(msgsnd) Error sending messsage");
+         exit(1);
+       }
+
+       if(msgrcv(msqid, &MyKeyFileMessage, sizeof(struct message) - sizeof(long), SENDER_DATA_TYPE, 0) == -1){
+         perror("(msgrcv) Error receiving message 2");
+         exit(1);
+       }
 			 msgSize = MyKeyFileMessage.size;
 
 		}
@@ -168,11 +198,23 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
  * @param signal - the signal type
  */
 
+
 void ctrlCSignal(int signal)
 {
 	/* Free system V resources */
-	cleanUp(shmid, msqid, sharedMemPtr);
+
+  if(exitCounter > 0){
+    fprintf(stderr, "Haha I have %d lives!\n", exitCounter);
+  }else{
+    fprintf(stderr, "Ahh you got me!\n");
+    exit(0);
+  }
+
+  --exitCounter;
+  cleanUp(shmid, msqid, sharedMemPtr);
 }
+
+
 
 int main()
 {
