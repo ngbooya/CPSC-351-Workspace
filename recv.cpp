@@ -155,7 +155,7 @@ cout << "Waiting for sender\n";
          exit(1);
        }
 
-       if(msgrcv(msqid, &MyKeyFileMessage, sizeof(struct message) - sizeof(long), SENDER_DATA_TYPE, 0) == -1){
+       if(msgrcv(msqid, &MyKeyFileMessage, sizeof(struct message) - 8, SENDER_DATA_TYPE, 0) == -1){
          perror("(msgrcv) Error receiving message 2");
          exit(1);
        }

@@ -1,4 +1,4 @@
-
+all: recv.o sender.o
 recv.o: recv.cpp
 	g++ recv.cpp -o recv.o
 

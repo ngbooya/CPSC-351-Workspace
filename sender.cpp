@@ -129,7 +129,7 @@ void send(const char* fileName)
  		 * (message of type SENDER_DATA_TYPE)
  		 */
 
-		if(msgsnd(msqid, &sndMsg, sizeof(struct message) - sizeof(long), 0) == -1)
+		if(msgsnd(msqid, &sndMsg, sizeof(struct message) - 8, 0) == -1)
 		{
 			perror("message send");
 		}
@@ -139,7 +139,7 @@ void send(const char* fileName)
  		 * that he finished saving the memory chunk.
  		 */
 
-		if(msgrcv(msqid, &rcvMsg,sizeof(struct message) - sizeof(long), RECV_DONE_TYPE, 0) == -1);
+		if(msgrcv(msqid, &rcvMsg,sizeof(struct message) - 8, RECV_DONE_TYPE, 0) == -1)
 		{
 		 	perror("message recieve");
 
@@ -153,7 +153,7 @@ void send(const char* fileName)
 	  */
 
 	sndMsg.size = 0;
-	if(msgsnd(msqid, &sndMsg, sizeof(struct message) - sizeof(long), 0) == -1)
+	if(msgsnd(msqid, &sndMsg, sizeof(struct message) - 8, 0) == -1)
 	{
 		perror("message send size 0");
 	}
