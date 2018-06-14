@@ -45,10 +45,9 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 		    may have the same key.
 	 */
 
-	 key_t key_for_mem;
 
  	//System call to return a key from keyfile.txt which contains "Hello World"
- 	 key_for_mem = ftok("keyfile.txt", 'a');
+ 	 key_t key_for_mem = ftok("keyfile.txt", 'a');
 
  	 //cout << key_for_mem << endl;
 
@@ -91,7 +90,7 @@ void mainLoop()
 		perror("fopen");
 		exit(-1);
 	}
-
+cout << "Waiting for sender\n";
     /* TODO: Receive the message and get the message size. The message will
      * contain regular information. The message will be of SENDER_DATA_TYPE
      * (the macro SENDER_DATA_TYPE is defined in msg.h).  If the size field
@@ -110,11 +109,9 @@ void mainLoop()
 		 msgrcv(msqid, &MyKeyFileMessage,sizeof(struct message) - sizeof(long) ,SENDER_DATA_TYPE, 0);
 ////////////////////////////////////////////////////////////////////////////////////////////
 		 msgSize = MyKeyFileMessage.size; //Added
-
-
-	/* Keep receiving until the sender set the size to 0, indicating that
- 	 * there is no more data to send
- 	 */
+		 /* Keep receiving until the sender set the size to 0, indicating that
+		  * there is no more data to send
+		  */
 
 	while(msgSize != 0)
 	{
@@ -132,7 +129,7 @@ void mainLoop()
  			 * does not matter in this case).
  			 */
 			 MyKeyFileMessage.mtype=RECV_DONE_TYPE;
-			 msgsnd(msqid, &MyKeyFileMessage,0,0);
+			 msgSize = MyKeyFileMessage.size;
 
 		}
 		/* We are done */
@@ -186,6 +183,8 @@ int main()
  	 * in ctrlCSignal().
  	 */
 
+	 signal(SIGINT, ctrlCSignal);
+
 	/* Initialize */
 	init(shmid, msqid, sharedMemPtr);
 
@@ -193,6 +192,7 @@ int main()
 	mainLoop();
 
 	/** TODO: Detach from shared memory segment, and deallocate shared memory and message queue (i.e. call cleanup) **/
-
+	cleanUp(shmid, msqid, sharedMemPtr);
+	cout << "DONE" << endl;
 	return 0;
 }
