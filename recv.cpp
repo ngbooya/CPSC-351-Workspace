@@ -2,7 +2,6 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <signal.h>
-
 #include <iostream>
 #include "msg.h"    /* For the message struct */
 
@@ -53,8 +52,9 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
  	 //cout << key_for_mem << endl;
 
 	/* TODO: Allocate a piece of shared memory. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE. */
+    shmid = shmget(key_for_mem, SHARED_MEMORY_CHUNK_SIZE, 0666 | IPC_CREAT);
 
-	 if((shmid = shmget(key_for_mem, SHARED_MEMORY_CHUNK_SIZE, 0666 | IPC_CREAT)) == -1 ){
+	 if(shmid == -1 ){
      perror("shmget");
      exit(1);
    }
@@ -62,8 +62,8 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
 
-
- if((msqid = msgget(key_for_mem, 0666 | IPC_CREAT)) == -1){
+  msqid = msgget(key_for_mem, 0666 | IPC_CREAT);
+ if(msqid == -1){
    perror("msgget");
    exit(1);
  }
@@ -105,7 +105,6 @@ void mainLoop()
 		perror("fopen");
 		exit(-1);
 	}
-cout << "Waiting for sender\n";
     /* TODO: Receive the message and get the message size. The message will
      * contain regular information. The message will be of SENDER_DATA_TYPE
      * (the macro SENDER_DATA_TYPE is defined in msg.h).  If the size field
@@ -121,8 +120,8 @@ cout << "Waiting for sender\n";
 		 //From header file "msg.h"
 
 
-		 if(msgrcv(msqid, &MyKeyFileMessage, sizeof(struct message),SENDER_DATA_TYPE, 0) == -1){
-       perror("msgrcv: Error receiving message 1");
+		 if(msgrcv(msqid, &MyKeyFileMessage, sizeof(message),SENDER_DATA_TYPE, 0) == -1){
+       perror("msgrcv");
        fclose(fp);
        exit(1);
      }
@@ -151,12 +150,12 @@ cout << "Waiting for sender\n";
 
 
        if(msgsnd(msqid,&MyKeyFileMessage,0,0) == -1){
-         perror("(msgsnd) Error sending messsage");
+         perror("msgsnd");
          exit(1);
        }
 
-       if(msgrcv(msqid, &MyKeyFileMessage, sizeof(struct message) - 8, SENDER_DATA_TYPE, 0) == -1){
-         perror("(msgrcv) Error receiving message 2");
+       if(msgrcv(msqid, &MyKeyFileMessage, sizeof(message) - 8, SENDER_DATA_TYPE, 0) == -1){
+         perror("msgrcv");
          exit(1);
        }
 			 msgSize = MyKeyFileMessage.size;

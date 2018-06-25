@@ -3,8 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <iostream>
 #include "msg.h"    /* For the message struct */
 
+
+using namespace std;
 /* The size of the shared memory chunk */
 #define SHARED_MEMORY_CHUNK_SIZE 1000
 
@@ -39,23 +42,28 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	/* Store the IDs and the pointer to the shared memory region in the corresponding parameters */
 	/* TODO: Get the id of the shared memory segment. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE */
 
-	if((shmid = shmget(mykey, SHARED_MEMORY_CHUNK_SIZE, 0666 | IPC_CREAT)) == -1)
+
+	shmid = shmget(mykey, SHARED_MEMORY_CHUNK_SIZE, 0666 | IPC_CREAT);
+
+	if(shmid == -1)
 	{
-		perror("shared memory ID");
+		perror("Shared memory");
 	}
 
 	/* TODO: Attach to the shared memory */
 
 	if((sharedMemPtr = shmat(shmid, NULL, 0)) == (char *)(-1))
 	{
-		perror("shared memory pointer");
+		perror("Shared Memory Ptr");
 	}
 
 	/* TODO: Attach to the message queue */
 
-	if((msqid = msgget(mykey, 0666 | IPC_CREAT)) == -1)
+	msqid = msgget(mykey, 0666 | IPC_CREAT);
+
+	if(msqid == -1)
 	{
-		perror("message queue ID");
+		perror("Message queue");
 	}
 }
 
@@ -72,17 +80,17 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 
 	if(shmdt(sharedMemPtr) == -1)
 	{
-		perror("shared memory detach");
+		perror("");
 	}
 
 	if(shmctl(shmid, IPC_RMID, NULL) == -1)
 	{
-		perror("shared memory ID remove");
+		perror("Shared Memory ID");
 	}
 
 	if(msgctl(msqid, IPC_RMID, NULL) == -1)
 	{
-		perror("message queue ID remove");
+		perror("Message ID");
 	}
 
 }
@@ -112,14 +120,12 @@ void send(const char* fileName)
 	}
 
 	/* Read the whole file */
-	while(!feof(fp))
-	{
+	while(!feof(fp)){
 		/* Read at most SHARED_MEMORY_CHUNK_SIZE from the file and store them in shared memory.
  		 * fread will return how many bytes it has actually read (since the last chunk may be less
  		 * than SHARED_MEMORY_CHUNK_SIZE).
  		 */
-		if((sndMsg.size = fread(sharedMemPtr, sizeof(char), SHARED_MEMORY_CHUNK_SIZE, fp)) < 0)
-		{
+		if((sndMsg.size = fread(sharedMemPtr, sizeof(char), SHARED_MEMORY_CHUNK_SIZE, fp)) < 0){
 			perror("fread");
 			exit(-1);
 		}
@@ -129,9 +135,12 @@ void send(const char* fileName)
  		 * (message of type SENDER_DATA_TYPE)
  		 */
 
-		if(msgsnd(msqid, &sndMsg, sizeof(struct message) - 8, 0) == -1)
-		{
+		if(msgsnd(msqid, &sndMsg, sizeof(struct message) - 8, 0) == -1){
 			perror("message send");
+			exit(1);
+		}else{
+
+			cout << "Waiting for receiver...\n" ;
 		}
 
 
@@ -139,10 +148,9 @@ void send(const char* fileName)
  		 * that he finished saving the memory chunk.
  		 */
 
-		if(msgrcv(msqid, &rcvMsg,sizeof(struct message) - 8, RECV_DONE_TYPE, 0) == -1)
-		{
+		if(msgrcv(msqid, &rcvMsg,sizeof(struct message) - 8, RECV_DONE_TYPE, 0) == -1){
 		 	perror("message recieve");
-
+			exit(1);
 		}
 	}
 
@@ -155,7 +163,8 @@ void send(const char* fileName)
 	sndMsg.size = 0;
 	if(msgsnd(msqid, &sndMsg, sizeof(struct message) - 8, 0) == -1)
 	{
-		perror("message send size 0");
+		perror("message send size");
+		exit(1);
 	}
 
 	/* Close the file */
@@ -164,8 +173,7 @@ void send(const char* fileName)
 }
 
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv){
 
 	/* Check the command line arguments */
 	if(argc < 2)
