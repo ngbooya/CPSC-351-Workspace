@@ -5,7 +5,7 @@
 using namespace std;
 
 
-
+//Create structure to store information for each process
 struct Processes{
   int pID;
   int arriveTime;
@@ -27,7 +27,7 @@ int main(){
 
 
 
-    do{
+  /*  do{
         cout << "Enter memory size: ";
         cin >> memInput;
 
@@ -36,7 +36,7 @@ int main(){
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(),'\n');
 
-    }while(intFail == true);
+    }while(intFail == true);*/
 
 
     fstream inputFile;
