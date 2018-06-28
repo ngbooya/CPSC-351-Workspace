@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <queue>
 
 using namespace std;
 
@@ -22,7 +23,9 @@ int main(){
 
   int numOfProcesses = 0;
 
-  Processes prod1;
+  Processes prod;
+
+
 
     do{
         cout << "Enter memory size: ";
@@ -36,44 +39,46 @@ int main(){
     }while(intFail == true);
 
 
-
-
-
-
     fstream inputFile;
     inputFile.open("in1.txt", ios::in);
+
+  //  Processes MainProcess[8];
 
     if(!inputFile){
       cout << "Error. File does not exist!\n";
     }else{
 
         inputFile >> numOfProcesses;
-      //while(!inputFile.eof()){
-        inputFile >> prod1.pID;
-        inputFile >> prod1.arriveTime;
-        inputFile >> prod1.lifeTime;
-        inputFile >> prod1.numOfFrame;
 
-        for(int i = 0; i < prod1.numOfFrame; i++){
-          inputFile >> prod1.sizeOfFrame[i];
+        Processes * MainProcess = new Processes [numOfProcesses];
+
+      //while(!inputFile.eof()){
+      for(int a = 0; a < numOfProcesses; a++){
+
+        inputFile >> MainProcess[a].pID;
+        inputFile >> MainProcess[a].arriveTime;
+        inputFile >> MainProcess[a].lifeTime;
+        inputFile >> MainProcess[a].numOfFrame;
+
+        for(int b = 0; b < MainProcess[a].numOfFrame; b++){
+          inputFile >> MainProcess[a].sizeOfFrame[b];
         }
 
-    //  }
+    cout << MainProcess[a].pID << endl;
+    cout << MainProcess[a].arriveTime << " ";
+    cout << MainProcess[a].lifeTime << endl;
+    cout << MainProcess[a].numOfFrame << " ";
+
+
+
+    for(int c = 0; c < MainProcess[a].numOfFrame; c++){
+      cout << MainProcess[a].sizeOfFrame[c] << " ";
     }
-
-    cout << prod1.pID << endl;
-    cout << prod1.arriveTime << endl;
-    cout << prod1.lifeTime << endl;
-    cout << prod1.numOfFrame << endl;
-
-    cout << prod1.sizeOfFrame[0] << endl;
-    cout << prod1.sizeOfFrame[1] << endl;
-    cout <<"###############################" << endl;
-
-    for(int i = 0; i < prod1.numOfFrame; i++){
-      cout << prod1.sizeOfFrame[i] << endl;
-    }
-
+    cout << endl << endl;
+  }
 
   return 0;
+
+
+  }
 }
