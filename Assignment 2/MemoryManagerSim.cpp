@@ -23,7 +23,6 @@ int main(){
 
   int numOfProcesses = 0;
 
-  Processes prod;
 
 
 
@@ -42,40 +41,41 @@ int main(){
     fstream inputFile;
     inputFile.open("in1.txt", ios::in);
 
-  //  Processes MainProcess[8];
 
     if(!inputFile){
       cout << "Error. File does not exist!\n";
     }else{
 
-        inputFile >> numOfProcesses;
+      inputFile >> numOfProcesses;
 
-        Processes * MainProcess = new Processes [numOfProcesses];
+      Processes * MainProcess = new Processes [numOfProcesses];
 
       //while(!inputFile.eof()){
-      for(int a = 0; a < numOfProcesses; a++){
+      for(int processIndex = 0; processIndex < numOfProcesses; processIndex++){
 
-        inputFile >> MainProcess[a].pID;
-        inputFile >> MainProcess[a].arriveTime;
-        inputFile >> MainProcess[a].lifeTime;
-        inputFile >> MainProcess[a].numOfFrame;
+        inputFile >> MainProcess[processIndex].pID;
+        inputFile >> MainProcess[processIndex].arriveTime;
+        inputFile >> MainProcess[processIndex].lifeTime;
+        inputFile >> MainProcess[processIndex].numOfFrame;
 
-        for(int b = 0; b < MainProcess[a].numOfFrame; b++){
-          inputFile >> MainProcess[a].sizeOfFrame[b];
+        for(int frameIndex = 0; frameIndex < MainProcess[processIndex].numOfFrame; frameIndex++){
+          inputFile >> MainProcess[processIndex].sizeOfFrame[frameIndex];
         }
 
-    cout << MainProcess[a].pID << endl;
-    cout << MainProcess[a].arriveTime << " ";
-    cout << MainProcess[a].lifeTime << endl;
-    cout << MainProcess[a].numOfFrame << " ";
+
+    //Output results of file for testing purposes
+      cout << MainProcess[processIndex].pID << endl;
+      cout << MainProcess[processIndex].arriveTime << " ";
+      cout << MainProcess[processIndex].lifeTime << endl;
+      cout << MainProcess[processIndex].numOfFrame << " ";
 
 
 
-    for(int c = 0; c < MainProcess[a].numOfFrame; c++){
-      cout << MainProcess[a].sizeOfFrame[c] << " ";
+      for(int c = 0; c < MainProcess[processIndex].numOfFrame; c++){
+        cout << MainProcess[processIndex].sizeOfFrame[c] << " ";
+      }
+      cout << endl << endl;
     }
-    cout << endl << endl;
-  }
 
   return 0;
 
