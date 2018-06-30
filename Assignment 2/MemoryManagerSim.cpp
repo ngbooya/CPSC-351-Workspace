@@ -23,14 +23,15 @@ struct pageObject
 	int memSizeBase, memSizeLimit, timeIn, timeOut, processID;
 };
 
+/*this function takes process information and splits the processes' memory space request into page size*/
 void makePages(Processes mainProc[], int procNum, pageObject pageTablebuff[], int pageSizebuff){
     int *memRequest, currentPage = 0;
 
-    memRequest = new int [procNum];
+    memRequest = new int [procNum]; //make an array[processID] to store their memory request
 
     for(int i = 0; i < procNum; i++)
     {
-      if(mainProc[i].numOfFrame > 1)
+      if(mainProc[i].numOfFrame > 1) //if the frame size is 2 or more add the size of the frame together
       {
         for(int c = 0; c < mainProc[i].numOfFrame; c++)
           memRequest[i] += mainProc[i].sizeOfFrame[c];
@@ -38,17 +39,18 @@ void makePages(Processes mainProc[], int procNum, pageObject pageTablebuff[], in
           memRequest[i] = mainProc[i].sizeOfFrame[0];
     }
 
+    /*this section is not complete until i see the queue function*/
     for(int i = 0; i < procNum; i++)
     {
-    	for(int c = currentPage; c < currentPage + (memRequest[i]/pageSizebuff); c++)
+    	for(int c = currentPage; c < currentPage + (memRequest[i]/pageSizebuff); c++) //(memRequest / pageSizebuff) = the page numbers
     	{
-    		pageTablebuff[c].memSizeBase = c * pageSizebuff;
-    		pageTablebuff[c].memSizeLimit = pageTablebuff[c].memSizeBase + (pageSizebuff - 1);
-        pageTablebuff[c].timeIn = mainProc[i].arriveTime;
+    		pageTablebuff[c].memSizeBase = c * pageSizebuff; //creates the min memory size of the current page; reminder: array[page number]
+    		pageTablebuff[c].memSizeLimit = pageTablebuff[c].memSizeBase + (pageSizebuff - 1); //calculate the limit or max of the current page
+        pageTablebuff[c].timeIn = mainProc[i].arriveTime; //saves info into current page; same for the next 2 lines
         pageTablebuff[c].timeOut = mainProc[i].lifeTime;
         pageTablebuff[c].processID = mainProc[i].pID;
     	}
-        currentPage += memRequest[i]/pageSizebuff;
+        currentPage += memRequest[i]/pageSizebuff; //this lets me know where the last index was filled
     }
 
 //christian is working above
@@ -120,9 +122,11 @@ int main(){
 
     //christian is working below
 
-  	pageNum = memInput / pageSize;
+  	pageNum = memInput / pageSize; //since memInput and pageSize can vary, divides the two to get page numbers.
+    //ex: total memory size = 2000 and each page has a size of 100, then 2000/100 = 20 pages
+    //makePages function simulates or creates the PAGE TABLE; the table will have 20 pages or an array of 20
 
-  	pageObject *pageTable = new pageObject [pageNum];
+  	pageObject *pageTable = new pageObject [pageNum]; //create an array of objects (contains info of processes)
 
     makePages(MainProcess, numOfProcesses, pageTable, pageSize);
 
