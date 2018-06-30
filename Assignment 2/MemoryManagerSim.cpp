@@ -54,7 +54,7 @@ void makePages(Processes mainProc[], int procNum, pageObject pageTablebuff[], in
 
 //christian is working above
 
-};
+}
 
 int main(){
 
@@ -89,7 +89,7 @@ int main(){
 
       Processes * MainProcess = new Processes [numOfProcesses];
 
-      //while(!inputFile.eof()){
+
       for(int processIndex = 0; processIndex < numOfProcesses; processIndex++){ //Index through the file to read
 
         inputFile >> MainProcess[processIndex].pID; //First row
