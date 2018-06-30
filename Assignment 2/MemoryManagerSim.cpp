@@ -100,7 +100,10 @@ int main(){
         for(int frameIndex = 0; frameIndex < MainProcess[processIndex].numOfFrame; frameIndex++){
           inputFile >> MainProcess[processIndex].sizeOfFrame[frameIndex];
         }
-
+	//inserting Processes into queue
+        for(int i = 0; i < numOfProcesses; i++){
+          processQueue.push(MainProcess[i])
+        }
       /*
       //Output results of file for testing purposes
       cout << MainProcess[processIndex].pID << endl;
