@@ -16,9 +16,48 @@ struct Processes{
 
 };
 
+//christian is working below
+
+struct pageObject
+{
+	int memSizeBase, memSizeLimit, timeIn, timeOut, processID;
+};
+
+void makePages(Processes mainProc[], int procNum, pageObject pageTablebuff[], int pageSizebuff){
+    int *memRequest, currentPage = 0;
+
+    memRequest = new int [procNum];
+
+    for(int i = 0; i < procNum; i++)
+    {
+      if(mainProc[i].numOfFrame > 1)
+      {
+        for(int c = 0; c < mainProc[i].numOfFrame; c++)
+          memRequest[i] += mainProc[i].sizeOfFrame[c];
+      } else
+          memRequest[i] = mainProc[i].sizeOfFrame[0];
+    }
+
+    for(int i = 0; i < procNum; i++)
+    {
+    	for(int c = currentPage; c < currentPage + (memRequest[i]/pageSizebuff); c++)
+    	{
+    		pageTablebuff[c].memSizeBase = c * pageSizebuff;
+    		pageTablebuff[c].memSizeLimit = pageTablebuff[c].memSizeBase + (pageSizebuff - 1);
+        pageTablebuff[c].timeIn = mainProc[i].arriveTime;
+        pageTablebuff[c].timeOut = mainProc[i].lifeTime;
+        pageTablebuff[c].processID = mainProc[i].pID;
+    	}
+        currentPage += memRequest[i]/pageSizebuff;
+    }
+
+//christian is working above
+
+};
+
 int main(){
 
-  int memInput = 0;
+  int memInput = 2000, pageNum = 0, pageSize = 100;
   bool intFail;
 
   int numOfProcesses = 0;
@@ -62,8 +101,8 @@ int main(){
           inputFile >> MainProcess[processIndex].sizeOfFrame[frameIndex];
         }
 
-
-    //Output results of file for testing purposes
+      /*
+      //Output results of file for testing purposes
       cout << MainProcess[processIndex].pID << endl;
       cout << MainProcess[processIndex].arriveTime << " ";
       cout << MainProcess[processIndex].lifeTime << endl;
@@ -75,7 +114,29 @@ int main(){
         cout << MainProcess[processIndex].sizeOfFrame[c] << " ";
       }
       cout << endl << endl;
+      */
+
     }
+
+    //christian is working below
+
+  	pageNum = memInput / pageSize;
+
+  	pageObject *pageTable = new pageObject [pageNum];
+
+    makePages(MainProcess, numOfProcesses, pageTable, pageSize);
+
+    // output below for testing purposes
+  	for(int i = 0; i < pageNum; i++)
+  	{
+  		cout << pageTable[i].memSizeBase << "  -  " << pageTable[i].memSizeLimit
+          << '\t' << "Page size, " << "Page #" << (i + 1) << ", Proccess #" << pageTable[i].processID << endl;
+  	}
+
+    //christian is working above
+
+    delete[] MainProcess;
+  	delete[] pageTable;
 
   return 0;
 
