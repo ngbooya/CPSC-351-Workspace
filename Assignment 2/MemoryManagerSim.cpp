@@ -23,7 +23,7 @@ struct pageObject
 	int memSizeBase, memSizeLimit, timeIn, timeOut, processID;
 };
 
-/*this function takes process information and splits the processes' memory space request into page size*/
+//this function takes process information and splits the processes' memory space request into page size
 void makePages(Processes mainProc[], int procNum, pageObject pageTablebuff[], int pageSizebuff){
     int *memRequest, currentPage = 0;
 
@@ -82,24 +82,23 @@ int main(){
     fstream inputFile;
     inputFile.open("in1.txt", ios::in);
 
-
     if(!inputFile){
       cout << "Error. File does not exist!\n";
     }else{
 
-      inputFile >> numOfProcesses;
+      inputFile >> numOfProcesses; //Read in first number of the input file, number of total processes
 
       Processes * MainProcess = new Processes [numOfProcesses];
 
       //while(!inputFile.eof()){
-      for(int processIndex = 0; processIndex < numOfProcesses; processIndex++){
+      for(int processIndex = 0; processIndex < numOfProcesses; processIndex++){ //Index through the file to read
 
-        inputFile >> MainProcess[processIndex].pID;
-        inputFile >> MainProcess[processIndex].arriveTime;
-        inputFile >> MainProcess[processIndex].lifeTime;
-        inputFile >> MainProcess[processIndex].numOfFrame;
+        inputFile >> MainProcess[processIndex].pID; //First row
+        inputFile >> MainProcess[processIndex].arriveTime; //First number of the second row
+        inputFile >> MainProcess[processIndex].lifeTime; //Second number on the second row
+        inputFile >> MainProcess[processIndex].numOfFrame; //First number on the third row
 
-        for(int frameIndex = 0; frameIndex < MainProcess[processIndex].numOfFrame; frameIndex++){
+        for(int frameIndex = 0; frameIndex < MainProcess[processIndex].numOfFrame; frameIndex++){ //Read multiple number of frames
           inputFile >> MainProcess[processIndex].sizeOfFrame[frameIndex];
         }
 
