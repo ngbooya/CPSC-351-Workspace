@@ -85,7 +85,7 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
 void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[], int pageNumBuff, int timerBuff)
 {
   //checks number of free page and compares current timer with process (arriveTime + lifeTime) time
-  if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumUsed > 0)
+  if((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff)
   {
     for (int i = 0; i < pageNumBuff; i++)
     {
