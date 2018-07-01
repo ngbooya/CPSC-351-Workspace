@@ -90,10 +90,6 @@ void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[
     if(pageTablebuff[i].processID <= 0)
       pageNumFree++; //used for checking
   }
-
-<<<<<<< HEAD
-}
-=======
   if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumFree > 0)
   {
     for (int i = 0; i < pageNumBuff; i++)
@@ -108,7 +104,44 @@ void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[
     }
   }
 };
->>>>>>> ca980ae82219aab2612c0173d07f3acb7c89bc40
+
+void processQueue(Processes tempProc[], int temp_numOfProcess){
+  int processTimer = 0;
+  int processCounter = 0;
+  int processIndex = 0;
+
+  Processes * OrderQ = new Processes [temp_numOfProcess];
+
+  do{
+
+    for(int i = 0; i < temp_numOfProcess; i++){
+
+      if(tempProc[i].arriveTime == processTimer){ //Push process into array
+        OrderQ[processIndex] = tempProc[i];
+        cout << OrderQ[processIndex].pID << " entering at time of " << OrderQ[processIndex].arriveTime << endl;
+        processCounter++;
+        processIndex++;
+        cout << "\t Number of process in array is " << processCounter << endl;
+
+      }
+
+      if((tempProc[i].arriveTime + tempProc[i].lifeTime) == processTimer){ //Delete process from array
+        //Do whatever when lifetime is up
+
+        for(int j = 0; j < processIndex; j++){
+          if(OrderQ[j].pID == tempProc[i].pID){
+            cout << OrderQ[j].pID << " exiting at time of " << OrderQ[j].arriveTime + OrderQ[j].lifeTime << endl;
+            processCounter--;
+            cout << "\t Number of process in array is " << processCounter << endl;
+          }
+        }
+      }
+    }
+    processTimer++;
+  }while(processCounter != 0);
+
+  cout << endl << "Total Process time: " << processTimer - 1 << endl; //Minus 1 to total time because of postfix increment
+}
 
 //christian is working above
 
@@ -174,6 +207,9 @@ int main(){
 
     }
 
+
+    processQueue(MainProcess, numOfProcesses);
+
     //christian is working below
 
   	pageNum = memInput / pageSize; //since memInput and pageSize can vary, divides the two to get page numbers.
@@ -203,7 +239,6 @@ int main(){
               << '\t' << "Page size, " << "Page #" << (i + 1) << ", Proccess #" << pageTable[i].processID << endl;
         }
       }
-
       timer++;
     };
 
@@ -211,9 +246,7 @@ int main(){
 
     delete[] MainProcess;
   	delete[] pageTable;
+  }
 
   return 0;
-
-
-  }
 }
