@@ -81,30 +81,38 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
     }
 };
 
+//remove pages from the page table when their time is up
 void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[], int pageNumBuff, int timerBuff)
 {
-  int pageNumFree = 0, timeBuff = 1000;
+  int pageNumUsed = 0;
 
   for(int i = 0; i < pageNumBuff; i++)
   {
     if(pageTablebuff[i].processID <= 0)
-      pageNumFree++; //used for checking
+      pageNumUsed++; //used for checking
   }
+<<<<<<< HEAD
   if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumFree > 0)
+=======
+
+  //checks number of free page and compares current timer with process (arriveTime + lifeTime) time
+  if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumUsed > 0)
+>>>>>>> 45b3d9ff24cd8d26f7e89c4951566a38ea96736c
   {
     for (int i = 0; i < pageNumBuff; i++)
     {
-      if(pageTablebuff[i].processID == mainProc[procIDbuff-1].pID)
+      if(pageTablebuff[i].processID == mainProc[procIDbuff-1].pID) //if the check above is true, then compare process to page info
       {
-        pageTablebuff[i].memSizeBase = 0;
+        pageTablebuff[i].memSizeBase = 0; //if checks above is true, then zero-out the info
         pageTablebuff[i].memSizeLimit = 0;
         pageTablebuff[i].processID = 0;
-        pageNumFree--;
+        pageNumUsed--; //derements to reduce the for-loop checking; not all the pages will be used
       }
     }
   }
 };
 
+<<<<<<< HEAD
 void processQueue(Processes tempProc[], int temp_numOfProcess){ // int &systemTimer
   int processTimer = 0; //Note that timer is local to this function; In order implement available memory space will need to create global timer variable
   int processCounter = 0;
@@ -155,6 +163,8 @@ void processQueue(Processes tempProc[], int temp_numOfProcess){ // int &systemTi
 
   cout << endl << "Total Process time: " << processTimer - 1 << endl; //Minus 1 to total time because of postfix increment
 }
+=======
+>>>>>>> 45b3d9ff24cd8d26f7e89c4951566a38ea96736c
 
 //christian is working above
 
