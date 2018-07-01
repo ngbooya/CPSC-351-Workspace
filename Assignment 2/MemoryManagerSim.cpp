@@ -40,16 +40,16 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
         memRequest += mainProc[procIDbuff-1].sizeOfFrame[i];
 
       if((memRequest % pageSizebuff) > 0) //if requested memory = 250 and page size = 100, then 250%100 = 50
-        memRequest += pageSizebuff;       //this rounds a memory request to a full page size
+        memRequest += pageSizebuff - (memRequest%pageSizebuff); //this changes partial a memory request to a full page size
 
       for(int i = 0; i < pageNumBuff; i++)
       {
         if(pageTablebuff[i].processID <= 0 && memRequest > 0) //check if current page is empty and memory is being requested
         {
           pageTablebuff[i].memSizeBase = i * pageSizebuff; //"page number = array index"; i = current page number, mult. by page size to get the base (starting memory)
-          pageTablebuff[i].memSizeLimit = pageTablebuff[i].memSizeBase + (pageSizebuff - 1); //add base to limit
+          pageTablebuff[i].memSizeLimit = pageTablebuff[i].memSizeBase + (pageSizebuff - 1); //add base to pageSize to get the limit
           pageTablebuff[i].processID = mainProc[procIDbuff-1].pID;
-          memRequest -= pageSizebuff; //decrements memory request by "page size" amount; since each page is fixed to the pageSize
+          memRequest -= pageSizebuff; //decrements memory request by "page size" amount; since each page is fixed to pageSize
           pageNumFree--;
         }
       }
@@ -59,7 +59,7 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
       memRequest = mainProc[procIDbuff-1].sizeOfFrame[0];
 
       if((memRequest % pageSizebuff) > 0)
-        memRequest += pageSizebuff;
+        memRequest += pageSizebuff - (memRequest%pageSizebuff);
 
       for(int i = 0; i < pageNumBuff; i++)
       {
