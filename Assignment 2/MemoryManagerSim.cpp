@@ -18,48 +18,103 @@ struct Processes{
 
 //christian is working below
 
-struct pageObject
+struct pageObject //each pages contains this info
 {
-	int memSizeBase, memSizeLimit, timeIn, timeOut, processID;
+	int memSizeBase, memSizeLimit, processID;
 };
 
 //this function takes process information and splits the processes' memory space request into page size
-void makePages(Processes mainProc[], int procNum, pageObject pageTablebuff[], int pageSizebuff){
-    int *memRequest, currentPage = 0;
+void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[], int pageSizebuff, int pageNumBuff)
+{
+    int memRequest = 0, pageNumFree = 0;
 
-    memRequest = new int [procNum]; //make an array[processID] to store their memory request
-
-    for(int i = 0; i < procNum; i++)
+    for(int i = 0; i < pageNumBuff; i++)
     {
-      if(mainProc[i].numOfFrame > 1) //if the frame size is 2 or more add the size of the frame together
+      if(pageTablebuff[i].processID <= 0)
+        pageNumFree++; //used for checking
+    }
+
+    if(mainProc[procIDbuff-1].numOfFrame > 1) //if numofFrame > 2, then add the two sizeofFrame together
+    {
+      for(int i = 0; i < mainProc[procIDbuff-1].numOfFrame; i++)
+        memRequest += mainProc[procIDbuff-1].sizeOfFrame[i];
+
+      if((memRequest % pageSizebuff) > 0) //if requested memory = 250 and page size = 100, then 250%100 = 50
+        memRequest += pageSizebuff - (memRequest%pageSizebuff); //this changes partial a memory request to a full page size
+
+      if(pageNumFree >= (memRequest/pageSizebuff)) //checks if there are enough pages to fit the requested memory size
       {
-        for(int c = 0; c < mainProc[i].numOfFrame; c++)
-          memRequest[i] += mainProc[i].sizeOfFrame[c];
-      } else
-          memRequest[i] = mainProc[i].sizeOfFrame[0];
+        for(int i = 0; i < pageNumBuff; i++)
+        {
+          if(pageTablebuff[i].processID <= 0 && memRequest > 0) //check if current page is empty and memory is being requested
+          {
+            pageTablebuff[i].memSizeBase = i * pageSizebuff; //"page number = array index"; i = current page number, mult. by page size to get the base (starting memory)
+            pageTablebuff[i].memSizeLimit = pageTablebuff[i].memSizeBase + (pageSizebuff - 1); //add base to pageSize to get the limit
+            pageTablebuff[i].processID = mainProc[procIDbuff-1].pID;
+            memRequest -= pageSizebuff; //decrements memory request by "page size" amount; since each page is fixed to pageSize
+            pageNumFree--;
+          }
+        }
+      }
     }
-
-    /*this section is not complete until i see the queue function*/
-    for(int i = 0; i < procNum; i++)
+    else //if numOfFrame = 1; similar to the one above
     {
-    	for(int c = currentPage; c < currentPage + (memRequest[i]/pageSizebuff); c++) //(memRequest / pageSizebuff) = the page numbers
-    	{
-    		pageTablebuff[c].memSizeBase = c * pageSizebuff; //creates the min memory size of the current page; reminder: array[page number]
-    		pageTablebuff[c].memSizeLimit = pageTablebuff[c].memSizeBase + (pageSizebuff - 1); //calculate the limit or max of the current page
-        pageTablebuff[c].timeIn = mainProc[i].arriveTime; //saves info into current page; same for the next 2 lines
-        pageTablebuff[c].timeOut = mainProc[i].lifeTime;
-        pageTablebuff[c].processID = mainProc[i].pID;
-    	}
-        currentPage += memRequest[i]/pageSizebuff; //this lets me know where the last index was filled
+      memRequest = mainProc[procIDbuff-1].sizeOfFrame[0];
+
+      if((memRequest % pageSizebuff) > 0)
+        memRequest += pageSizebuff - (memRequest%pageSizebuff);
+
+      if(pageNumFree >= (memRequest/pageSizebuff))
+      {
+        for(int i = 0; i < pageNumBuff; i++)
+        {
+          if(pageTablebuff[i].processID <= 0 && memRequest > 0) //check if current page is empty and memory is being requested
+          {
+            pageTablebuff[i].memSizeBase = i * pageSizebuff; //"page number = array index"; i = current page number, mult. by page size to get the base (starting memory)
+            pageTablebuff[i].memSizeLimit = pageTablebuff[i].memSizeBase + (pageSizebuff - 1); //add base to pageSize to get the limit
+            pageTablebuff[i].processID = mainProc[procIDbuff-1].pID;
+            memRequest -= pageSizebuff; //decrements memory request by "page size" amount; since each page is fixed to pageSize
+            pageNumFree--;
+          }
+        }
+      }
     }
+};
+
+void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[], int pageNumBuff, int timerBuff)
+{
+  int pageNumFree = 0, timeBuff = 1000;
+
+  for(int i = 0; i < pageNumBuff; i++)
+  {
+    if(pageTablebuff[i].processID <= 0)
+      pageNumFree++; //used for checking
+  }
+
+<<<<<<< HEAD
+}
+=======
+  if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumFree > 0)
+  {
+    for (int i = 0; i < pageNumBuff; i++)
+    {
+      if(pageTablebuff[i].processID == mainProc[procIDbuff-1].pID)
+      {
+        pageTablebuff[i].memSizeBase = 0;
+        pageTablebuff[i].memSizeLimit = 0;
+        pageTablebuff[i].processID = 0;
+        pageNumFree--;
+      }
+    }
+  }
+};
+>>>>>>> ca980ae82219aab2612c0173d07f3acb7c89bc40
 
 //christian is working above
 
-}
-
 int main(){
 
-  int memInput = 2000, pageNum = 0, pageSize = 100;
+  int memInput = 2000, pageNum = 0, pageSize = 100, timer = 0;
   bool intFail;
 
   int numOfProcesses = 0;
@@ -127,14 +182,30 @@ int main(){
 
   	pageObject *pageTable = new pageObject [pageNum]; //create an array of objects (contains info of processes)
 
-    makePages(MainProcess, numOfProcesses, pageTable, pageSize);
+    while(timer <= 1500)
+    {
+      makePages(MainProcess, 1, pageTable, pageSize, pageNum); //simulates process #1 going in from queue
+      makePages(MainProcess, 2, pageTable, pageSize, pageNum); //simulates process #2 going in from queue
+      makePages(MainProcess, 3, pageTable, pageSize, pageNum); //simulates process #3 going in from queue; this does not fit so remove process #1
+      removePages(MainProcess, 1, pageTable, pageNum, timer); //simulates removing process #1 from page table
+      makePages(MainProcess, 3, pageTable, pageSize, pageNum); //simulates process #3 going in from queue
 
-    // output below for testing purposes
-  	for(int i = 0; i < pageNum; i++)
-  	{
-  		cout << pageTable[i].memSizeBase << "  -  " << pageTable[i].memSizeLimit
-          << '\t' << "Page size, " << "Page #" << (i + 1) << ", Proccess #" << pageTable[i].processID << endl;
-  	}
+      // output below for testing purposes
+      if(timer == 0 || timer == 1000)
+      {
+        if(timer == 0)
+          cout << endl << "at timer = 0, process #3 doesn't fit" << endl;
+        if(timer == 1000)
+          cout << endl << "at timer = 1000, removes process #1 and allocate space for process #3" << endl;
+        for(int i = 0; i < pageNum; i++)
+        {
+          cout << pageTable[i].memSizeBase << "  -  " << pageTable[i].memSizeLimit
+              << '\t' << "Page size, " << "Page #" << (i + 1) << ", Proccess #" << pageTable[i].processID << endl;
+        }
+      }
+
+      timer++;
+    };
 
     //christian is working above
 
