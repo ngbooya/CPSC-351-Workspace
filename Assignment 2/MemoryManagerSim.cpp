@@ -84,8 +84,25 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
 //remove pages from the page table when their time is up
 void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[], int pageNumBuff, int timerBuff)
 {
+<<<<<<< HEAD
   //checks number of free page and compares current timer with process (arriveTime + lifeTime) time
   if((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff)
+=======
+  int pageNumUsed = 0;
+
+  for(int i = 0; i < pageNumBuff; i++)
+  {
+    if(pageTablebuff[i].processID <= 0)
+      pageNumUsed++; //used for checking
+  }
+<<<<<<< HEAD
+  if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumFree > 0)
+=======
+
+  //checks number of free page and compares current timer with process (arriveTime + lifeTime) time
+  if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumUsed > 0)
+>>>>>>> 45b3d9ff24cd8d26f7e89c4951566a38ea96736c
+>>>>>>> ef4257549fc2446a2cba31eaeabb3e410b88178e
   {
     for (int i = 0; i < pageNumBuff; i++)
     {
@@ -99,6 +116,59 @@ void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[
   }
 };
 
+<<<<<<< HEAD
+void processQueue(Processes tempProc[], int temp_numOfProcess){ // int &systemTimer
+  int processTimer = 0; //Note that timer is local to this function; In order implement available memory space will need to create global timer variable
+  int processCounter = 0;
+  int processIndex = 0;
+
+  Processes * OrderQ = new Processes [temp_numOfProcess];
+
+  do{
+
+    for(int i = 0; i < temp_numOfProcess; i++){
+
+      if(tempProc[i].arriveTime == processTimer){ //Push process into array
+        OrderQ[processIndex] = tempProc[i];
+        cout << OrderQ[processIndex].pID << " entering at time of " << OrderQ[processIndex].arriveTime << endl; //Output for testing
+        processCounter++;
+        processIndex++;
+        cout << "\t Number of process in array is " << processCounter << endl;
+
+      }
+
+      if((tempProc[i].arriveTime + tempProc[i].lifeTime) == processTimer){ //Delete process from array
+
+
+        for(int j = 0; j < processIndex; j++){
+          if(OrderQ[j].pID == tempProc[i].pID){
+            cout << OrderQ[j].pID << " exiting at time of " << OrderQ[j].arriveTime + OrderQ[j].lifeTime << endl; //Output for testing
+            /*Do whatever when lifetime is up
+
+
+            Christian, this is where the lifetime is up and is dequeued.
+
+
+
+
+
+
+
+
+            */
+            processCounter--;
+            cout << "\t Number of process in array is " << processCounter << endl;
+          }
+        }
+      }
+    }
+    processTimer++;
+  }while(processCounter != 0);
+
+  cout << endl << "Total Process time: " << processTimer - 1 << endl; //Minus 1 to total time because of postfix increment
+}
+=======
+>>>>>>> 45b3d9ff24cd8d26f7e89c4951566a38ea96736c
 
 //christian is working above
 
@@ -111,8 +181,8 @@ int main(){
 
 
 
-
-  /*  do{
+  //Prompt user for memory size
+    do{
         cout << "Enter memory size: ";
         cin >> memInput;
 
@@ -121,7 +191,7 @@ int main(){
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(),'\n');
 
-    }while(intFail == true);*/
+    }while(intFail == true);
 
 
     fstream inputFile;
@@ -164,6 +234,9 @@ int main(){
 
     }
 
+
+    processQueue(MainProcess, numOfProcesses); // int &systemTimer
+
     //christian is working below
 
   	pageNum = memInput / pageSize; //since memInput and pageSize can vary, divides the two to get page numbers.
@@ -193,7 +266,6 @@ int main(){
               << '\t' << "Page size, " << "Page #" << (i + 1) << ", Proccess #" << pageTable[i].processID << endl;
         }
       }
-
       timer++;
     };
 
@@ -201,9 +273,7 @@ int main(){
 
     delete[] MainProcess;
   	delete[] pageTable;
+  }
 
   return 0;
-
-
-  }
 }
