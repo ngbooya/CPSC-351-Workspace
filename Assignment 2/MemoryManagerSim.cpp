@@ -105,8 +105,8 @@ void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[
   }
 };
 
-void processQueue(Processes tempProc[], int temp_numOfProcess){
-  int processTimer = 0;
+void processQueue(Processes tempProc[], int temp_numOfProcess){ // int &systemTimer
+  int processTimer = 0; //Note that timer is local to this function; In order implement available memory space will need to create global timer variable
   int processCounter = 0;
   int processIndex = 0;
 
@@ -118,7 +118,7 @@ void processQueue(Processes tempProc[], int temp_numOfProcess){
 
       if(tempProc[i].arriveTime == processTimer){ //Push process into array
         OrderQ[processIndex] = tempProc[i];
-        cout << OrderQ[processIndex].pID << " entering at time of " << OrderQ[processIndex].arriveTime << endl;
+        cout << OrderQ[processIndex].pID << " entering at time of " << OrderQ[processIndex].arriveTime << endl; //Output for testing
         processCounter++;
         processIndex++;
         cout << "\t Number of process in array is " << processCounter << endl;
@@ -126,11 +126,24 @@ void processQueue(Processes tempProc[], int temp_numOfProcess){
       }
 
       if((tempProc[i].arriveTime + tempProc[i].lifeTime) == processTimer){ //Delete process from array
-        //Do whatever when lifetime is up
+
 
         for(int j = 0; j < processIndex; j++){
           if(OrderQ[j].pID == tempProc[i].pID){
-            cout << OrderQ[j].pID << " exiting at time of " << OrderQ[j].arriveTime + OrderQ[j].lifeTime << endl;
+            cout << OrderQ[j].pID << " exiting at time of " << OrderQ[j].arriveTime + OrderQ[j].lifeTime << endl; //Output for testing
+            /*Do whatever when lifetime is up
+
+
+            Christian, this is where the lifetime is up and is dequeued.
+
+
+
+
+
+
+
+
+            */
             processCounter--;
             cout << "\t Number of process in array is " << processCounter << endl;
           }
@@ -154,8 +167,8 @@ int main(){
 
 
 
-
-  /*  do{
+  //Prompt user for memory size
+    do{
         cout << "Enter memory size: ";
         cin >> memInput;
 
@@ -164,7 +177,7 @@ int main(){
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(),'\n');
 
-    }while(intFail == true);*/
+    }while(intFail == true);
 
 
     fstream inputFile;
@@ -208,7 +221,7 @@ int main(){
     }
 
 
-    processQueue(MainProcess, numOfProcesses);
+    processQueue(MainProcess, numOfProcesses); // int &systemTimer
 
     //christian is working below
 
