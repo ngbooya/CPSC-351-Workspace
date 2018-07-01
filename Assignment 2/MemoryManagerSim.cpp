@@ -84,7 +84,7 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
 //remove pages from the page table when their time is up
 void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[], int pageNumBuff, int timerBuff)
 {
-  int pageNumFree = 0, timeBuff = 1000;
+  int pageNumFree = 0;
 
   for(int i = 0; i < pageNumBuff; i++)
   {
@@ -97,9 +97,9 @@ void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[
   {
     for (int i = 0; i < pageNumBuff; i++)
     {
-      if(pageTablebuff[i].processID == mainProc[procIDbuff-1].pID) //if the check is true, then compare process and zero-out info
+      if(pageTablebuff[i].processID == mainProc[procIDbuff-1].pID) //if the check above is true, then compare process to page info
       {
-        pageTablebuff[i].memSizeBase = 0;
+        pageTablebuff[i].memSizeBase = 0; //if checks above is true, then zero-out the info
         pageTablebuff[i].memSizeLimit = 0;
         pageTablebuff[i].processID = 0;
         pageNumFree--; //derements to reduce the for-loop checking; not all the pages will be free
