@@ -18,7 +18,7 @@ struct Processes{
 
 //christian is working below
 
-struct pageObject
+struct pageObject //each pages contains this info
 {
 	int memSizeBase, memSizeLimit, processID;
 };
@@ -31,7 +31,7 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
     for(int i = 0; i < pageNumBuff; i++)
     {
       if(pageTablebuff[i].processID <= 0)
-        pageNumFree++; //might need for later use
+        pageNumFree++; //used for checking
     }
 
     if(mainProc[procIDbuff-1].numOfFrame > 1) //if numofFrame > 2, then add the two sizeofFrame together
@@ -42,15 +42,18 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
       if((memRequest % pageSizebuff) > 0) //if requested memory = 250 and page size = 100, then 250%100 = 50
         memRequest += pageSizebuff - (memRequest%pageSizebuff); //this changes partial a memory request to a full page size
 
-      for(int i = 0; i < pageNumBuff; i++)
+      if(pageNumFree >= (memRequest/pageSizebuff)) //checks if there are enough pages to fit the requested memory size
       {
-        if(pageTablebuff[i].processID <= 0 && memRequest > 0) //check if current page is empty and memory is being requested
+        for(int i = 0; i < pageNumBuff; i++)
         {
-          pageTablebuff[i].memSizeBase = i * pageSizebuff; //"page number = array index"; i = current page number, mult. by page size to get the base (starting memory)
-          pageTablebuff[i].memSizeLimit = pageTablebuff[i].memSizeBase + (pageSizebuff - 1); //add base to pageSize to get the limit
-          pageTablebuff[i].processID = mainProc[procIDbuff-1].pID;
-          memRequest -= pageSizebuff; //decrements memory request by "page size" amount; since each page is fixed to pageSize
-          pageNumFree--;
+          if(pageTablebuff[i].processID <= 0 && memRequest > 0) //check if current page is empty and memory is being requested
+          {
+            pageTablebuff[i].memSizeBase = i * pageSizebuff; //"page number = array index"; i = current page number, mult. by page size to get the base (starting memory)
+            pageTablebuff[i].memSizeLimit = pageTablebuff[i].memSizeBase + (pageSizebuff - 1); //add base to pageSize to get the limit
+            pageTablebuff[i].processID = mainProc[procIDbuff-1].pID;
+            memRequest -= pageSizebuff; //decrements memory request by "page size" amount; since each page is fixed to pageSize
+            pageNumFree--;
+          }
         }
       }
     }
@@ -61,15 +64,18 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
       if((memRequest % pageSizebuff) > 0)
         memRequest += pageSizebuff - (memRequest%pageSizebuff);
 
-      for(int i = 0; i < pageNumBuff; i++)
+      if(pageNumFree >= (memRequest/pageSizebuff))
       {
-        if(pageTablebuff[i].processID <= 0 && memRequest > 0)
+        for(int i = 0; i < pageNumBuff; i++)
         {
-          pageTablebuff[i].memSizeBase = i * pageSizebuff;
-          pageTablebuff[i].memSizeLimit = pageTablebuff[i].memSizeBase + (pageSizebuff - 1);
-          pageTablebuff[i].processID = mainProc[procIDbuff-1].pID;
-          memRequest -= pageSizebuff;
-          pageNumFree--;
+          if(pageTablebuff[i].processID <= 0 && memRequest > 0) //check if current page is empty and memory is being requested
+          {
+            pageTablebuff[i].memSizeBase = i * pageSizebuff; //"page number = array index"; i = current page number, mult. by page size to get the base (starting memory)
+            pageTablebuff[i].memSizeLimit = pageTablebuff[i].memSizeBase + (pageSizebuff - 1); //add base to pageSize to get the limit
+            pageTablebuff[i].processID = mainProc[procIDbuff-1].pID;
+            memRequest -= pageSizebuff; //decrements memory request by "page size" amount; since each page is fixed to pageSize
+            pageNumFree--;
+          }
         }
       }
     }
