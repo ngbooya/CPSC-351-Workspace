@@ -80,6 +80,32 @@ void makePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[],
       }
     }
 };
+
+void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[], int pageNumBuff, int timerBuff)
+{
+  int pageNumFree = 0, timeBuff = 1000;
+
+  for(int i = 0; i < pageNumBuff; i++)
+  {
+    if(pageTablebuff[i].processID <= 0)
+      pageNumFree++; //used for checking
+  }
+
+  if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumFree > 0)
+  {
+    for (int i = 0; i < pageNumBuff; i++)
+    {
+      if(pageTablebuff[i].processID == mainProc[procIDbuff-1].pID)
+      {
+        pageTablebuff[i].memSizeBase = 0;
+        pageTablebuff[i].memSizeLimit = 0;
+        pageTablebuff[i].processID = 0;
+        pageNumFree--;
+      }
+    }
+  }
+};
+
 //christian is working above
 
 int main(){
@@ -152,16 +178,30 @@ int main(){
 
   	pageObject *pageTable = new pageObject [pageNum]; //create an array of objects (contains info of processes)
 
-    makePages(MainProcess, 1, pageTable, pageSize, pageNum); //simulates process #1 going in from queue
-    makePages(MainProcess, 2, pageTable, pageSize, pageNum); //simulates process #2 going in from queue
-    makePages(MainProcess, 3, pageTable, pageSize, pageNum); //simulates process #3 going in from queue
-
-    // output below for testing purposes
-    for(int i = 0; i < pageNum; i++)
+    while(timer <= 1500)
     {
-      cout << pageTable[i].memSizeBase << "  -  " << pageTable[i].memSizeLimit
-          << '\t' << "Page size, " << "Page #" << (i + 1) << ", Proccess #" << pageTable[i].processID << endl;
-    }
+      makePages(MainProcess, 1, pageTable, pageSize, pageNum); //simulates process #1 going in from queue
+      makePages(MainProcess, 2, pageTable, pageSize, pageNum); //simulates process #2 going in from queue
+      makePages(MainProcess, 3, pageTable, pageSize, pageNum); //simulates process #3 going in from queue; this does not fit so remove process #1
+      removePages(MainProcess, 1, pageTable, pageNum, timer); //simulates removing process #1 from page table
+      makePages(MainProcess, 3, pageTable, pageSize, pageNum); //simulates process #3 going in from queue
+
+      // output below for testing purposes
+      if(timer == 0 || timer == 1000)
+      {
+        if(timer == 0)
+          cout << endl << "at timer = 0, process #3 doesn't fit" << endl;
+        if(timer == 1000)
+          cout << endl << "at timer = 1000, removes process #1 and allocate space for process #3" << endl;
+        for(int i = 0; i < pageNum; i++)
+        {
+          cout << pageTable[i].memSizeBase << "  -  " << pageTable[i].memSizeLimit
+              << '\t' << "Page size, " << "Page #" << (i + 1) << ", Proccess #" << pageTable[i].processID << endl;
+        }
+      }
+
+      timer++;
+    };
 
     //christian is working above
 
