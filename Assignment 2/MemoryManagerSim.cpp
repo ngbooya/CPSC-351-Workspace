@@ -92,7 +92,13 @@ void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[
       pageNumFree++; //used for checking
   }
 
+<<<<<<< HEAD
   //checks number of free page and compares current timer with process (arriveTime + lifeTime) time
+=======
+<<<<<<< HEAD
+}
+=======
+>>>>>>> dc16b0ab6c573952509528f0a0bcb3056e87d9a8
   if(((mainProc[procIDbuff-1].arriveTime + mainProc[procIDbuff-1].lifeTime) == timerBuff) && pageNumFree > 0)
   {
     for (int i = 0; i < pageNumBuff; i++)
@@ -107,6 +113,7 @@ void removePages(Processes mainProc[], int procIDbuff, pageObject pageTablebuff[
     }
   }
 };
+>>>>>>> ca980ae82219aab2612c0173d07f3acb7c89bc40
 
 //christian is working above
 
@@ -143,7 +150,7 @@ int main(){
 
       Processes * MainProcess = new Processes [numOfProcesses];
 
-      //while(!inputFile.eof()){
+
       for(int processIndex = 0; processIndex < numOfProcesses; processIndex++){ //Index through the file to read
 
         inputFile >> MainProcess[processIndex].pID; //First row
